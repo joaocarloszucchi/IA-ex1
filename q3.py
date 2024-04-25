@@ -48,7 +48,7 @@ class StateManager:
         """Finds a solution to the Farmer problem using a Depth First Search"""
         state = (self.farmer, self.wolf, self.sheep, self.cabbage)
         print("F | W | S | C | State number ", self.counter)
-        print(self.farmer + ' | ' + self.wolf + ' | ' + self.sheep + ' | ' + self.cabbage + '\n')
+        print(self.farmer + ' | ' + self.wolf + ' | ' + self.sheep + ' | ' + self.cabbage)
         self.counter += 1
 
         if self.isStateFinal(state):
@@ -64,7 +64,11 @@ class StateManager:
             self.wolf = possibleTransitions[i][1]
             self.sheep = possibleTransitions[i][2]
             self.cabbage = possibleTransitions[i][3]
-            return self.depthFirstSearch()
+            self.printTransition(state, (self.farmer, self.wolf, self.sheep, self.cabbage))
+            if self.depthFirstSearch():
+                return True
+        
+        return False
 
     def generatePossibleTransitions(self, state):
         """Generate the possible transitions"""
@@ -115,7 +119,17 @@ class StateManager:
                 return False
         return True
 
+    @staticmethod
+    def printTransition(state0, state1):
+        if state0[1] != state1[1]:
+            print("Moving wolf from " + state0[0] + " to " + state1[0] + '\n')
+        elif state0[2] != state1[2]:
+            print("Moving sheep from " + state0[0] + " to " + state1[0] + '\n') 
+        elif state0[3] != state1[3]:
+            print("Moving cabbage from " + state0[0] + " to " + state1[0] + '\n')
+        else:
+            print("Moving farmer from " + state0[0] + " to " + state1[0] + '\n')
+
 if __name__ == '__main__':
     control = StateManager('L', 'L', 'L', 'L')
     control.depthFirstSearch()
-
