@@ -93,4 +93,6 @@ class StateManager:
     
 if __name__ == '__main__':
     control = StateManager(0, 0)
+    print("\n------Starting q2------")
     control.breadthFirstSearch()
+    print("\n------Finishing q2------")

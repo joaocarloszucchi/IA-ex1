@@ -132,4 +132,6 @@ class StateManager:
 
 if __name__ == '__main__':
     control = StateManager('L', 'L', 'L', 'L')
+    print("\n------Starting q3------")
     control.depthFirstSearch()
+    print("\n------Finishing q3------")
