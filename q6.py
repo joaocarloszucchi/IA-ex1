@@ -50,8 +50,8 @@ class StateManager:
 
         self.addStates()
         self.current = initial
-        self.cost = 0
         self.goal = final
+        self.cost = 0
         self.counter = 0
 
     def addStates(self):

@@ -20,6 +20,9 @@ class State:
         self.destiny = destiny
         self.cost = cost
 
+    def getOpposite(self):
+        return State(self.destiny, self.source, self.cost)
+
 class StateManager:
     states = []
 
@@ -30,6 +33,7 @@ class StateManager:
         self.addStates()
         self.current = initial
         self.goal = final
+        self.cost = 0
         self.counter = 0
 
     def addStates(self):
@@ -46,9 +50,58 @@ class StateManager:
         self.states.append(State('F', 'H', 4))
         self.states.append(State('G', 'H', 1))
 
+        length = len(self.states)
+        for i in range(length):
+            self.states.append(self.states[i].getOpposite())
+
+    def greedySearch(self):
+        print("\nStarting Greedy Search\n")
+
+        self.queueCities.append(self.current)
+        self.closedCities.append(self.current)
+
+        while self.queueCities:
+            print("\nClosed states: ", self.closedCities)
+            print("Queue order: ", self.queueCities)
+            print("Current city | State number ", self.counter)
+            print(str(self.current) + '            | ')
+            self.counter += 1
+
+            if self.isStateFinal():
+                print("Solution found!")
+                return True
+            
+            self.generateDestiniesG()
+            self.current = self.queueCities[0][0]
+            self.cost = self.queueCities[0][1]
+
+        print("\nFinishing Greedy Search\n")
+
+    def generateDestiniesG(self):
+        """Generate the possible destinies from self.current using the Greedy Search Algorithm"""
+        for i in range(len(self.states)):
+            if self.states[i].source == self.current and self.states[i].destiny not in self.closedCities:
+                self.queueCities.append((self.states[i].destiny, self.evalCost(self.states[i])))
+                self.closedCities.append(self.states[i].destiny)
+                print("candidate ", self.states[i].destiny, ' from ', self.current)
+        self.queueCities.pop(0)
+        self.sortByCost()
+
+    def sortByCost(self):
+        """sorts the self.queueStates for lowest cost"""
+        self.queueCities = sorted(self.queueCities, key = lambda city: city[1])
+
+    def evalCost(self, state):
+        """Evalues the cost of the state by the following formula: (Total current cost) + (Transition cost)"""
+        return self.cost + state.cost
+
+    def isStateFinal(self):
+        return self.current == self.goal
+
 if __name__ == '__main__':
     print("\n------Starting q5------")
 
     controlB = StateManager('A', 'H')
+    controlB.greedySearch()
 
     print("\n------Finishing q5------")
