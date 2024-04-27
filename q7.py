@@ -1,22 +1,13 @@
 """
-(Exerc. 6) Vamos considerar novamente o Problema das Rotas, onde rotas entre cidades são especificadas na Figura 2.
-Figura 2 – Mapa de rotas entre cidades, onde as arestas do grafo apresentam os valores de custo g(n) de deslocamento 
-(as vias são bidirecionais) 
-Como heurística h(n), usaremos a distância em linha reta entre a cidade corrente e a cidade que se deseja atingir. Vamos 
-encontrar uma rota que leve da cidade A à cidade K e, para facilitar a exposição, vamos definir a função heurística h(n) 
-da seguinte forma:  
-h(a) = 15, h(b) = 7, h(c) = 6, h(d) = 14, h(e) = 15, h(f) = 7, h(g) = 8, h(h) = 5, h(i) = 5, h(j) = 3, h(k) = 0, h(l) = 4 
-Para o Problema das Rotas, apresentar: 
-a) o passo a passo o estado das listas de novos abertos e nodos fechados para o algoritmo de busca gulosa pela melhor 
-escolha para s0 = a e G = [k] 
-b) desenhe a árvore de busca produzida quando o algoritmo de busca gulosa pela melhor escolha é chamado com s0 = 
-a e G = [k].  
-5 
-Neste exercício, o algoritmo deve usar os valores heurísticos h(n) apresentados acima. 
+(Exerc. 7) Para o Problema das Rotas especificado no Exercício 6, apresentar: 
+a) o passo a passo o estado das listas de novos abertos e nodos fechados usados pelo algoritmo A* para s0 = a e G = [k] 
+b) desenhe a árvore de busca produzida quando o algoritmo A* é chamado com s0 = a e G = [k].  
+Neste exercício, o algoritmo deve usar os valores de custo g(n) e heurísticos h(n) apresentados anteriormente. 
 c) Implementar algoritmos para solucionar as questões propostas. Entregar (i) print (em pdf) do passo a passo de 
 execução dos algoritmos e das soluções do problema e (ii) código fonte das implementações: legível, identado, variáveis 
 nomeadas de forma compreensível, comentado - padrão JavaDoc ou Doxigen, e orientado a objetos. 
 """
+
 class State:
     def __init__(self, source, destiny, cost):
         self.source = source
@@ -50,6 +41,7 @@ class StateManager:
         self.addStates()
         self.current = initial
         self.goal = final
+        self.cost = 0
         self.counter = 0
 
     def addStates(self):
@@ -94,6 +86,7 @@ class StateManager:
             
             self.generateDestiniesG()
             self.current = self.queueCities[0][0]
+            self.cost = self.queueCities[0][1] - self.heuristic[self.current]
 
         print("\nFinishing Greedy Search\n")
 
@@ -112,16 +105,16 @@ class StateManager:
         self.queueCities = sorted(self.queueCities, key = lambda city: city[1])
 
     def evalCost(self, state):
-        """Evalues the cost of the state by the following formula: (Heuristic cost)"""
-        return self.heuristic[state.destiny]
+        """Evalues the cost of the state by the following formula: (Total current cost) + (Transition cost) + (Heuristic cost)"""
+        return self.cost + state.cost + self.heuristic[state.destiny]
 
     def isStateFinal(self):
         return self.current == self.goal
 
 if __name__ == '__main__':
-    print("\n------Starting q6------")
+    print("\n------Starting q7------")
 
     controlB = StateManager('A', 'K')
     controlB.greedySearch()
 
-    print("\n------Finishing q6------")
+    print("\n------Finishing q7------")
