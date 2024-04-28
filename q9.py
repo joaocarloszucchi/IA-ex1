@@ -1,10 +1,6 @@
 """
-(Exerc. 10) Consider o seguinte problema. 
-7 
-Dados 5 palitos cada jogador pode retirar 1, 2 ou 3 por turno. Perde o jogador que retira o último palito. A pergunta é: 
-será que max pode ganhar o jogo? 
-Usando a seguinte função de utilidade: F(S) = +1 se MAX ganhar, -1 se MIN ganhar, desenhar a árvore de busca.  
-a) Apresentar os valores de min e max propagados na árvore de busca construída 
+(Exerc. 9) Conside a seguinte árvore de busca. 
+a) Apresentar os valores de min e max propagados na árvore de busca 
 b) Adotando a poda alfa-beta, nos sentidos i) da esquerda para a direita e ii) da direita para a esquerda, indicar quais 
 arestas/subárvores serão podadas. 
 c) Implementar algoritmos para solucionar as questões propostas. Entregar (i) print (em pdf) do passo a passo de 
@@ -13,69 +9,52 @@ nomeadas de forma compreensível, comentado - padrão JavaDoc ou Doxigen, e orie
 """
 
 class Node():
-    def __init__(self, operation, value, functionValue = 0):
+    def __init__(self, operation, value = None):
         self.operation = operation
         self.value = value
-        self.functionValue = functionValue
         self.children = []
 
 class StateManager():
     opposite = {'MAX':'MIN', 'MIN':'MAX'}
     root = None
 
-    def __init__(self, number):
-        self.number = number
+    def __init__(self):
         self.genTree()
 
     def genTree(self):
-        self.root = Node('MAX', self.number)
-        self.genTreeRec(self.root)
-        self.evalFunctionValues(self.root)
+        values = [20, 33, -45, 31, 24, 25, -10, 20, 40, -25, 18, -42, 24, -19, 36, -41]
+        self.root = self.createNode('MAX', 0, values)
 
-    def genTreeRec(self, father):
-        children = self.genChildrenIndex(father.value)
-        for i in range(len(children)):
-            father.children.append(Node(self.opposite[father.operation], children[i], self.genFunctionValue(self.opposite[father.operation], children[i])))
-
-            self.genTreeRec(father.children[-1])
-
-    def genChildrenIndex(self, value):
-        if value == 0:
-            return []
-        elif value == 1:
-            return [0]
-        elif value == 2:
-            return [1, 0]
+    def createNode(self, operation, depth, values):
+        node = Node(operation)
+        if depth == 4:
+            node.value = values.pop(0)
         else:
-            return [value - 1, value - 2, value - 3]
+            node.children.append(self.createNode(self.opposite[operation], depth + 1, values))
+            node.children.append(self.createNode(self.opposite[operation], depth + 1, values))
+        return node
         
-    def genFunctionValue(self, operation, value):
-        if value != 0:
-            return 0
-        if operation == 'MAX':
-            return 1
-        elif operation == 'MIN':
-            return -1
-
-    def evalFunctionValues(self, node=None):
+    def evalFunctionValues(self, node):
         if node is None:
-            node = self.root
-        if node.value != 0:
-            for child in node.children:
-                self.evalFunctionValues(child)
-            if node.operation == 'MAX':
-                node.functionValue = max(child.functionValue for child in node.children)
-            elif node.operation == 'MIN':
-                node.functionValue = min(child.functionValue for child in node.children)
+            return
 
-    def alphaBetaPruningLR(self, node, alpha, beta, isMaximizingPlayer, level = 0):
+        for child in node.children:
+            self.evalFunctionValues(child)
+
+        if node.children:
+            if node.operation == 'MAX':
+                node.value = max(child.value for child in node.children)
+            elif node.operation == 'MIN':
+                node.value = min(child.value for child in node.children)
+
+    def alphaBetaPruningLR(self, node, alpha, beta, maximizingPlayer, level = 0):
         """Performs Alpha-Beta Pruning from left to right"""
         if len(node.children) == 0:
-            print('  ' * level + str(node.value) + ' ' + node.operation + ' ' + str(node.functionValue))
-            return node.functionValue
+            print('  ' * level + str(node.value) + ' ' + node.operation )
+            return node.value
 
-        print('  ' * level + str(node.value) + ' ' + node.operation + ' ' + str(node.functionValue))
-        if isMaximizingPlayer:
+        print('  ' * level + str(node.value) + ' ' + node.operation )
+        if maximizingPlayer:
             maxEval = float('-inf')
             for child in node.children:
                 eval = self.alphaBetaPruningLR(child, alpha, beta, False, level + 1)
@@ -95,15 +74,15 @@ class StateManager():
                     print('  ' * (level + 1) + '(PRUNING HERE)')
                     break
             return minEval
-        
-    def alphaBetaPruningRL(self, node, alpha, beta, isMaximizingPlayer, level = 0):
-        """Performs Alpha-Beta Pruning from left to right"""
-        if len(node.children) == 0:
-            print('  ' * level + str(node.value) + ' ' + node.operation + ' ' + str(node.functionValue))
-            return node.functionValue
 
-        print('  ' * level + str(node.value) + ' ' + node.operation + ' ' + str(node.functionValue))
-        if isMaximizingPlayer:
+    def alphaBetaPruningRL(self, node, alpha, beta, maximizingPlayer, level = 0):
+        """Performs Alpha-Beta Pruning from right to left"""
+        if len(node.children) == 0:
+            print('  ' * level + str(node.value) + ' ' + node.operation )
+            return node.value
+
+        print('  ' * level + str(node.value) + ' ' + node.operation )
+        if maximizingPlayer:
             maxEval = float('-inf')
             for child in reversed(node.children):
                 eval = self.alphaBetaPruningRL(child, alpha, beta, False, level + 1)
@@ -123,25 +102,26 @@ class StateManager():
                     print('  ' * (level + 1) + '(PRUNING HERE)')
                     break
             return minEval
-        
+
     def printTree(self, node=None, level=0):
         if node is None:
             node = self.root
-        print('  ' * level + str(node.value) + ' ' + node.operation + ' ' + str(node.functionValue))
+        print('  ' * level + str(node.value) + ' ' + node.operation)
         for child in node.children:
             self.printTree(child, level+1)
 
 
 if __name__ == '__main__':
-    print("\n------Starting q10------")
+    print("\n------Starting q9------")
 
-    control = StateManager(5)
+    control = StateManager()
+    control.evalFunctionValues(control.root)
     control.printTree()
-
+    
     print("\n------Alpha Beta Pruning LR:------\n")
     control.alphaBetaPruningLR(control.root, float('-inf'), float('inf'), True)
 
     print("\n------Alpha Beta Pruning RL:------\n")
     control.alphaBetaPruningRL(control.root, float('-inf'), float('inf'), True)
 
-    print("\n------Finishing q10------")
+    print("\n------Finishing q9------")
