@@ -95,7 +95,7 @@ class StateManager():
                     print('  ' * (level + 1) + '(PRUNING HERE)')
                     break
             return minEval
-        
+
     def alphaBetaPruningRL(self, node, alpha, beta, isMaximizingPlayer, level = 0):
         """Performs Alpha-Beta Pruning from left to right"""
         if len(node.children) == 0:
@@ -123,7 +123,7 @@ class StateManager():
                     print('  ' * (level + 1) + '(PRUNING HERE)')
                     break
             return minEval
-        
+
     def printTree(self, node=None, level=0):
         if node is None:
             node = self.root
