@@ -182,14 +182,10 @@ class State:
         h7 = self.h7[board.index(7)]
         h8 = self.h8[board.index(8)]
 
-        #print("h are ", h1, h2, h3, h4, h5, h6, h7, h8)
-
         self.cost = h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8
         
-
-def printList(list):
-    for i in range(len(list)):
-        print(list[i])
+    def addStep(self):
+        self.cost += 1
 
 class StateManager:
     def __init__(self, initial):
@@ -213,9 +209,9 @@ class StateManager:
         self.closedStates.append(self.current.board)
 
         while self.queueStates:
-            #print("\nClosed states: ", printList(self.closedStates))
+            print("\nClosed states: ", self.closedStates)
             #print("Queue order: ", printList(self.queueStates))
-            print("\nCurrent state and cost          | State number ", self.counter)
+            print("Current state and cost          | State number ", self.counter)
             print(str(self.current)  + '   | ')
             self.counter += 1
 
@@ -239,9 +235,9 @@ class StateManager:
         self.closedStates.append(self.current.board)
 
         while self.queueStates:
-            #print("\nClosed states: ", printList(self.closedStates))
+            print("\nClosed states: ", self.closedStates)
             #print("Queue order: ", printList(self.queueStates))
-            print("\nCurrent state and cost          | State number ", self.counter)
+            print("Current state and cost          | State number ", self.counter)
             print(str(self.current)  + '   | ')
             self.counter += 1
 
@@ -258,6 +254,32 @@ class StateManager:
 
         print("\nFinishing Greedy Search S(step)\n")
 
+    def greedySearchA(self):
+        print("\nStarting Greedy Search A*")
+
+        self.queueStates.append(self.current)
+        self.closedStates.append(self.current.board)
+
+        while self.queueStates:
+            print("\nClosed states: ", self.closedStates)
+            #print("Queue order: ", printList(self.queueStates))
+            print("Current state and cost          | State number ", self.counter)
+            print(str(self.current)  + '   | ')
+            self.counter += 1
+
+            if self.counter == 100000:
+                return
+
+            if self.isStateFinal():
+                print("Solution found!")
+                return True
+            
+            self.queueStates.pop(0)
+            self.generateDestiniesA()
+            self.current = self.queueStates[0]
+
+        print("\nFinishing Greedy Search Heuristic\n")
+
     def generateDestiniesH(self):
         """Generate the possible destinies from self.current using the Greedy Search Algorithm Heuristic"""
         transitions = self.current.genPossibleTransitions()
@@ -271,12 +293,25 @@ class StateManager:
         self.sortByCost()
 
     def generateDestiniesS(self):
-        """Generate the possible destinies from self.current using the Greedy Search Algorithm S"""
+        """Generate the possible destinies from self.current using the Greedy Search Algorithm S(+1 by step)"""
         transitions = self.current.genPossibleTransitions()
         
         for i in range(len(transitions)):
             if transitions[i].board not in self.closedStates:
                 transitions[i].cost = transitions[i].cost + 1
+                self.queueStates.append(transitions[i])
+                self.closedStates.append(transitions[i].board)
+                #print("\ncandidate: ", transitions[i])
+        self.sortByCost()
+
+    def generateDestiniesA(self):
+        """Generate the possible destinies from self.current using the Greedy Search Algorithm A*"""
+        transitions = self.current.genPossibleTransitions()
+        
+        for i in range(len(transitions)):
+            if transitions[i].board not in self.closedStates:
+                transitions[i].evalHeuristic()
+                transitions[i].addStep()
                 self.queueStates.append(transitions[i])
                 self.closedStates.append(transitions[i].board)
                 #print("\ncandidate: ", transitions[i])
@@ -297,5 +332,8 @@ if __name__ == '__main__':
 
     controlS = StateManager([1, 3, 4, 8, 2, 0, 7, 6, 5])
     controlS.greedySearchS()
+
+    controlA = StateManager([1, 3, 4, 8, 2, 0, 7, 6, 5])
+    controlA.greedySearchA()
 
     print("\n------Finishing q8------")

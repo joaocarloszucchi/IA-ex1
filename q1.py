@@ -79,6 +79,7 @@ class StateManager:
                 self.queueStates.append(candidates[i])
     
     def isStatePossible(self, state):
+        """Checks if the state is valid"""
         m = state[0]
         c = state[1]
         pos = state[2]

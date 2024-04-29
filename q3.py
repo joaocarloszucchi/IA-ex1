@@ -47,6 +47,7 @@ class StateManager:
     def depthFirstSearch(self):
         """Finds a solution to the Farmer problem using a Depth First Search"""
         state = (self.farmer, self.wolf, self.sheep, self.cabbage)
+        print("\nClosed states: ", self.visitedStates)
         print("F | W | S | C | State number ", self.counter)
         print(self.farmer + ' | ' + self.wolf + ' | ' + self.sheep + ' | ' + self.cabbage)
         self.counter += 1

@@ -40,7 +40,9 @@ class StateManager:
         self.queueStates.append(state)
 
         while self.queueStates:
-            print("\nBowl3 | Bowl4 | State number ", self.counter)
+            print("\nClosed states: ", self.visitedStates)
+            print("Queue order: ", self.queueStates)
+            print("Bowl3 | Bowl4 | State number ", self.counter)
             print(str(self.bowl3) + '     | ' + str(self.bowl4))
             self.counter += 1
         
@@ -84,6 +86,7 @@ class StateManager:
                 self.queueStates.append(candidates[i])
 
     def isStatePossible(self, state):
+        """Checks if the state is valid"""
         return not state in self.visitedStates
 
     def isStateFinal(self, state):
